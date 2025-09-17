@@ -1,115 +1,194 @@
-// Global variables for the map and marker
-let map;
-let marker;
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
-// Get references to the HTML elements
-const latField = document.getElementById('latitude');
-const lonField = document.getElementById('longitude');
-const locateBtn = document.getElementById('locate-me-btn');
-const permissionMessage = document.getElementById('permission-denied-message');
-
-// This function is called by the Google Maps script once it has finished loading.
-function initMap() {
-    const defaultLocation = { lat: 13.0827, lng: 80.2707 }; // Default to Chennai
-
-    map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 12,
-        center: defaultLocation,
-        mapTypeControl: false,
-    });
-
-    marker = new google.maps.Marker({
-        position: defaultLocation,
-        map: map,
-        draggable: true,
-        title: "Drag me to your exact location!"
-    });
-
-    updateFields(defaultLocation.lat, defaultLocation.lng);
-
-    google.maps.event.addListener(marker, 'dragend', function() {
-        const newPosition = marker.getPosition();
-        updateFields(newPosition.lat(), newPosition.lng());
-    });
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f0f2f5;
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
 }
 
-// Function to update the visible latitude and longitude form fields
-function updateFields(lat, lng) {
-    latField.value = lat;
-    lonField.value = lng;
+header {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #0d47a1;
 }
 
-// Function to update the map's center and the marker's position
-function updateLocation(lat, lng) {
-    const newPos = { lat: lat, lng: lng };
-    map.setCenter(newPos);
-    map.setZoom(17);
-    marker.setPosition(newPos);
-    updateFields(lat, lng);
+.header-logo {
+    max-height: 80px; /* Controls the size of the logo */
+    margin-bottom: 15px;
 }
 
-// --- OPTIMIZED PERMISSION HANDLING ---
-locateBtn.addEventListener('click', function() {
-    // Hide any previous message
-    permissionMessage.style.display = 'none';
+header h1 {
+    margin: 0;
+}
 
-    if (navigator.permissions && navigator.permissions.query) {
-        // Use the modern Permissions API for smarter handling
-        navigator.permissions.query({ name: 'geolocation' }).then(function(permissionStatus) {
-            if (permissionStatus.state === 'granted') {
-                // Permission is already granted, get the location
-                getGeolocation();
-            } else if (permissionStatus.state === 'prompt') {
-                // Permission has not been asked yet, getGeolocation will trigger the prompt
-                getGeolocation();
-            } else if (permissionStatus.state === 'denied') {
-                // Permission was denied, show the helpful message
-                permissionMessage.style.display = 'block';
-            }
-            
-            // Listen for changes in permission status (e.g., if user enables it in settings)
-            permissionStatus.onchange = function() {
-                if (this.state === 'granted') {
-                    permissionMessage.style.display = 'none';
-                    getGeolocation();
-                }
-            };
-        });
-    } else if (navigator.geolocation) {
-        // Fallback for older browsers that don't support the Permissions API
-        getGeolocation();
-    } else {
-        alert("Geolocation is not supported by your browser.");
+.container {
+    max-width: 700px;
+    margin: 0 auto;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+fieldset {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+legend {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: #0d47a1;
+    padding: 0 10px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+input[type="text"],
+input[type="tel"],
+input[type="number"],
+textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+textarea {
+    resize: vertical;
+}
+
+#map {
+    height: 350px;
+    width: 100%;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+}
+
+.supply-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+}
+
+.supply-section h4 {
+    margin-top: 0;
+    color: #333;
+}
+
+.item-request {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.item-request input[type="checkbox"] {
+    margin-right: 10px;
+    width: 20px;
+    height: 20px;
+}
+
+.item-request label {
+    flex-grow: 1;
+    margin: 0;
+    font-weight: normal;
+}
+
+.item-request input[type="number"] {
+    width: 80px;
+    margin: 0;
+}
+
+button[type="submit"] {
+    background-color: #1565c0;
+    color: white;
+    padding: 15px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #0d47a1;
+}
+
+#locate-me-btn {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    background-color: #e0e0e0;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#locate-me-btn:hover {
+    background-color: #d1d1d1;
+}
+
+#locate-me-btn:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+}
+
+input[readonly] {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+}
+
+#permission-denied-message {
+    background-color: #fff3cd; /* Light yellow */
+    color: #664d03; /* Dark yellow text */
+    border: 1px solid #ffecb5;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+footer {
+    text-align: center;
+    margin-top: 30px;
+    padding: 10px;
+    color: #6c757d;
+}
+
+/* --- RESPONSIVE DESIGN FOR MOBILE & TABLETS --- */
+@media (max-width: 768px) {
+    body {
+        padding: 10px; /* Reduce padding on small screens */
     }
-});
 
-// This function contains the actual logic to request the user's position
-function getGeolocation() {
-    locateBtn.textContent = '🛰️ Locating...';
-    locateBtn.disabled = true;
+    .container {
+        padding: 15px; /* Reduce padding inside the form container */
+    }
 
-    navigator.geolocation.getCurrentPosition(
-        (position) => {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            updateLocation(lat, lng);
-            locateBtn.textContent = '📍 Find My Current Location';
-            locateBtn.disabled = false;
-        },
-        (error) => {
-            // Error handling is still useful for timeouts or other device issues
-             if (error.code === error.PERMISSION_DENIED) {
-                // If getCurrentPosition fails because of denial, show the message
-                permissionMessage.style.display = 'block';
-             } else {
-                alert("Could not get location. A timeout or other error occurred. Please try again.");
-             }
-            locateBtn.textContent = '📍 Find My Current Location';
-            locateBtn.disabled = false;
-        }, {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
-        }
-    );
+    header h1 {
+        font-size: 1.5em; /* Make header smaller */
+    }
 }
